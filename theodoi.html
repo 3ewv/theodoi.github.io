@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture Image Silently</title>
+    <style>
+        #cameraVideo {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="#" id="captureLink">Capture Image</a>
+
+    <video id="cameraVideo" autoplay></video>
+
+    <canvas id="cameraCanvas" style="display: none;"></canvas>
+
+    <script>
+        document.getElementById('captureLink').addEventListener('click', function (event) {
+            event.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
+
+            // Tạo một video element để chứa video từ camera
+            var video = document.getElementById('cameraVideo');
+
+            // Hàm chụp ảnh từ video
+            function captureImage() {
+                var canvas = document.getElementById('cameraCanvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                var context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Lưu trữ ảnh dưới dạng base64
+                var imageData = canvas.toDataURL('image/png');
+                console.log('Image captured:', imageData);
+            }
+
+            // Sự kiện khi video đã sẵn sàng
+            video.onloadedmetadata = function () {
+                // Chụp ảnh sau một khoảng thời gian ngắn để đảm bảo ảnh đã sẵn sàng
+                setTimeout(captureImage, 1000);
+            };
+
+            // Mở camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                })
+                .catch(function (err) {
+                    console.error('Lỗi: ' + err);
+                });
+        });
+    </script>
+</body>
+
+</html>
